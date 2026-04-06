@@ -1,5 +1,7 @@
 const express = require("express");
 const authRoutes = require("./src/Routes/authRoutes");
+const importRoutes = require("./src/Routes/importRoutes")
+const activityRoutes = require("./src/Routes/activityRoutes")
 
 const app  = express();
 
@@ -12,6 +14,8 @@ app.get("/", function(req,res){
   res.send("APi is running");
 })
 app.use("/api/auth",authRoutes);
+app.use("/api/import", importRoutes);
+app.use("/api/activity", activityRoutes);
 
 
 module.exports=app;
