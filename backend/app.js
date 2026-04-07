@@ -17,5 +17,7 @@ app.use("/api/auth",authRoutes);
 app.use("/api/import", importRoutes);
 app.use("/api/activity", activityRoutes);
 
+app.use("/api/import", importRoutes);
+
 
 module.exports=app;

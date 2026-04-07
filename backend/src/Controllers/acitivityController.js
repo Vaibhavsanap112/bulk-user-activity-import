@@ -8,17 +8,15 @@ const validateRecord = (record) => {
     return "Missing required fields";
   }
 
-  
   if (!email.includes("@")) {
     return "Invalid email format";
   }
-
 
   if (isNaN(new Date(timestamp))) {
     return "Invalid timestamp";
   }
 
-  return null; 
+  return null;
 };
 
 exports.bulkInsert = (req, res) => {
@@ -31,16 +29,15 @@ exports.bulkInsert = (req, res) => {
   let validRecords = [];
   let invalidRecords = [];
 
-  
   data.forEach((record) => {
     const error = validateRecord(record);
 
     if (error) {
-      invalidRecords.push({
-        import_id: importId,
-        error_message: error,
-        record_data: JSON.stringify(record),
-      });
+      invalidRecords.push([
+        importId,
+        error,
+        JSON.stringify(record),
+      ]);
     } else {
       validRecords.push([
         importId,
@@ -52,7 +49,8 @@ exports.bulkInsert = (req, res) => {
     }
   });
 
-  
+  console.log("Invalid Records:", invalidRecords);
+
   const insertValidQuery = `
     INSERT IGNORE INTO user_activity
     (import_id, user_id, email, activity_type, activity_time)
@@ -65,32 +63,6 @@ exports.bulkInsert = (req, res) => {
     VALUES ?
   `;
 
- 
-  if (validRecords.length > 0) {
-    db.query(insertValidQuery, [validRecords], (err) => {
-      if (err) {
-        console.log("Error inserting valid records:", err);
-        return res.status(500).json({ message: "DB error (valid records)" });
-      }
-    });
-  }
-
-  
-  if (invalidRecords.length > 0) {
-    const invalidValues = invalidRecords.map((r) => [
-      r.import_id,
-      r.error_message,
-      r.record_data,
-    ]);
-
-    db.query(insertInvalidQuery, [invalidValues], (err) => {
-      if (err) {
-        console.log("Error inserting invalid records:", err);
-      }
-    });
-  }
-
-  
   const updateQuery = `
     UPDATE import_logs
     SET 
@@ -100,21 +72,56 @@ exports.bulkInsert = (req, res) => {
     WHERE id = ?
   `;
 
-  db.query(
-    updateQuery,
-    [data.length, validRecords.length, invalidRecords.length, importId],
-    (err) => {
-      if (err) {
-        console.log("Error updating import_logs:", err);
-      }
+  
+  const insertValid = (callback) => {
+    if (validRecords.length === 0) return callback();
 
-      
-      res.json({
-        message: "Chunk processed",
-        processed: data.length,
-        success: validRecords.length,
-        failed: invalidRecords.length,
-      });
-    }
-  );
+    db.query(insertValidQuery, [validRecords], (err) => {
+      if (err) {
+        console.log("Error inserting valid:", err);
+        return res.status(500).json({ message: "Valid insert failed" });
+      }
+      callback();
+    });
+  };
+
+ 
+  const insertInvalid = (callback) => {
+    if (invalidRecords.length === 0) return callback();
+
+    db.query(insertInvalidQuery, [invalidRecords], (err) => {
+      if (err) {
+        console.log("Error inserting invalid:", err);
+        return res.status(500).json({ message: "Invalid insert failed" });
+      }
+      callback();
+    });
+  };
+
+  
+  const updateLogs = () => {
+    db.query(
+      updateQuery,
+      [data.length, validRecords.length, invalidRecords.length, importId],
+      (err) => {
+        if (err) {
+          console.log("Error updating logs:", err);
+        }
+
+        res.json({
+          message: "Chunk processed",
+          processed: data.length,
+          success: validRecords.length,
+          failed: invalidRecords.length,
+        });
+      }
+    );
+  };
+
+
+  insertValid(() => {
+    insertInvalid(() => {
+      updateLogs();
+    });
+  });
 };

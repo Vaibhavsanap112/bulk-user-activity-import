@@ -40,3 +40,17 @@ exports.getStatus = (req, res) => {
     res.json(result[0]);
   });
 };
+exports.getErrors = (req, res) => {
+  const importId = req.params.id;
+
+  const query = "SELECT * FROM failed_records WHERE import_id = ?";
+
+  db.query(query, [importId], (err, result) => {
+    if (err) {
+      console.log("Error fetching errors:", err);
+      return res.status(500).json({ message: "DB error" });
+    }
+
+    res.json(result);
+  });
+};
