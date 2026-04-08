@@ -25,7 +25,7 @@ export default function Upload(){
 
     const startData = await startRes.json();
     const importId = startData.importId;
-    localStorage.setItem("importID", importId);
+    localStorage.setItem("importId", importId);
 
     setStatus("Imortstarted...")
 
