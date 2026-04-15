@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {useNavigate} from "react-router-dom"
+import Signup from "./Signup";
 
 export default function Login(){
   const [email, setEmail] = useState("");
@@ -44,7 +45,8 @@ export default function Login(){
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <button onClick={handleLogin}>Login</button>
+      <button onClick={hadleLogin}>Login</button>
+      <button onClick={()=> navigate("/signup")}>Singup</button>
     </div>
   );
 }

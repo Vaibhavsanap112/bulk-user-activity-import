@@ -40,6 +40,7 @@ export default function Signup() {
       />
 
       <button onClick={handleSignup}>Signup</button>
+      <button onClick={()=> navigate("/")}>Login</button>
     </div>
   );
 }
