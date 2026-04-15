@@ -1,29 +1,17 @@
 const db = require("../Config/db");
 
+const {validateRecord}  = require("../validations/activityValidation")
 
-const validateRecord = (record) => {
-  const { userId, email, activity, timestamp } = record;
-
-  if (!userId || !email || !activity || !timestamp) {
-    return "Missing required fields";
-  }
-
-  if (!email.includes("@")) {
-    return "Invalid email format";
-  }
-
-  if (isNaN(new Date(timestamp))) {
-    return "Invalid timestamp";
-  }
-
-  return null;
-};
 
 exports.bulkInsert = (req, res) => {
   const { importId, data } = req.body;
 
   if (!importId || !Array.isArray(data)) {
     return res.status(400).json({ message: "Invalid request" });
+  }
+
+  if(data.length===0){
+    return res.status(400).json({message:"Invalid request"});
   }
 
   let validRecords = [];

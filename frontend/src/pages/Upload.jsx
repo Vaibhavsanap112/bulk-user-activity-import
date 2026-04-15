@@ -9,14 +9,34 @@ export default function Upload() {
   const handleUpload = async () => {
     try {
       if (!file) {
-        setError("Please select a file ❌");
+        setError("Please select a file");
         return;
       }
 
+      if(!file.name.endsWith(".json")){
+        setError("Only JSON files are allowed");
+        return;
+      }
+
+      let jsonData;
+      try{
+        const text= await file.text();
+        jsonData = JSON.parse(text);
+
+      }catch(err){
+        setError("Invalid JSON format");
+        return;
+      }
+
+      if(!Array.isArray(jsonData)){
+        setError("JSON must be an array");
+        return;
+      }
+      
+
       setError("");
 
-      const text = await file.text();
-      const jsonData = JSON.parse(text);
+      
 
       // 🔹 Start import
       const startRes = await fetch("http://localhost:3000/api/import/start", {
@@ -34,8 +54,8 @@ export default function Upload() {
 
       setStatus("Import started...");
 
-      const chunkSize = 500;
-      let processed = 0;
+      const chunkSize =Number(import.meta.env.VITE_CHUNK_SIZE) || 500;
+        let processed = 0;
 
       for (let i = 0; i < jsonData.length; i += chunkSize) {
         const chunk = jsonData.slice(i, i + chunkSize);
@@ -44,6 +64,7 @@ export default function Upload() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "userId":localStorage.getItem("userId"),
           },
           body: JSON.stringify({
             importId,

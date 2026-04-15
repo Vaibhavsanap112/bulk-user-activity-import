@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
+
 const db = require("../Config/db");
 const bcrypt = require("bcrypt");
+const { validateLogin , validateSignup} = require("../validations/authValidations");
 
 exports.test = (req,res)=>{
   res.send("Test route is running");
@@ -12,13 +14,10 @@ exports.signup = async(req,res)=>{
   try{
     const {name, email, password} = req.body;
 
-    if(!name || !email || !password){
-      return res.status(400).json({message:"All fields are required"});
-    }
-    if(!email.includes("@")){
-      return res.status(400).json({
-        message:"invalid Email format",
-      })
+    const error = validateSignup({name, email, password});
+
+    if(error){
+      return res.status(400).json({message:error});
     }
 
     const checkQuery = "select * from users where email=?";
@@ -47,16 +46,12 @@ exports.signup = async(req,res)=>{
 exports.login = (req,res)=>{
   const {email, password}= req.body;
 
-  if(!email || !password){
-    return res.status(400).json({message:"Email and password required"});
 
+  const error = validateLogin({email, password});
 
+  if(error){
+    return res.status(400).json({message:error});
   }
-   if(!email.includes("@")){
-      return res.status(400).json({
-        message:"invalid Email format",
-      })
-    }
   const query = "select * from users where email=?";
 
   db.query(query,[email], async(err, result)=>{
