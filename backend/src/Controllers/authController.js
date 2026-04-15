@@ -15,6 +15,11 @@ exports.signup = async(req,res)=>{
     if(!name || !email || !password){
       return res.status(400).json({message:"All fields are required"});
     }
+    if(!email.includes("@")){
+      return res.status(400).json({
+        message:"invalid Email format",
+      })
+    }
 
     const checkQuery = "select * from users where email=?";
     db.query(checkQuery,[email],async(err,result)=>{
@@ -47,6 +52,11 @@ exports.login = (req,res)=>{
 
 
   }
+   if(!email.includes("@")){
+      return res.status(400).json({
+        message:"invalid Email format",
+      })
+    }
   const query = "select * from users where email=?";
 
   db.query(query,[email], async(err, result)=>{

@@ -6,7 +6,6 @@ export default function Errors() {
 
   useEffect(() => {
     const importId = localStorage.getItem("importId");
-    console.log("ImportId:", importId);
 
     if (!importId) {
       setLoading(false);
@@ -20,8 +19,6 @@ export default function Errors() {
         );
 
         const data = await res.json();
-        console.log("Fetched errors:", data);
-
         setErrors(data);
       } catch (err) {
         console.log("Error fetching:", err);
@@ -34,52 +31,81 @@ export default function Errors() {
   }, []);
 
   if (loading) {
-    return <h2 style={{ padding: "20px" }}>Loading errors...</h2>;
+    return (
+      <div className="p-6 text-center text-lg">
+        Loading errors...
+      </div>
+    );
   }
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Invalid Records</h2>
+    <div className="p-6 bg-gray-100 min-h-screen">
+
+      <h2 className="text-2xl font-bold mb-4 text-center">
+        Invalid Records
+      </h2>
 
       {errors.length > 0 ? (
-        <table border="1" cellPadding="10">
-          <thead>
-            <tr>
-              <th>Error Message</th>
-              <th>User ID</th>
-              <th>Email</th>
-              <th>Activity</th>
-              <th>Timestamp</th>
-            </tr>
-          </thead>
+        <div className="overflow-x-auto">
 
-          <tbody>
-            {errors.map((err, index) => {
-              let record = {};
+          <table className="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
 
-              try {
-                record =
-                  typeof err.record_data === "string"
-                    ? JSON.parse(err.record_data)
-                    : err.record_data;
-              } catch (e) {
-                console.log("Parse error:", e);
-              }
+            {/* Header */}
+            <thead className="bg-gray-800 text-white">
+              <tr>
+                <th className="py-2 px-4 text-left">Error</th>
+                <th className="py-2 px-4 text-left">User ID</th>
+                <th className="py-2 px-4 text-left">Email</th>
+                <th className="py-2 px-4 text-left">Activity</th>
+                <th className="py-2 px-4 text-left">Timestamp</th>
+              </tr>
+            </thead>
 
-              return (
-                <tr key={index}>
-                  <td style={{ color: "red" }}>{err.error_message}</td>
-                  <td>{record.userId || "N/A"}</td>
-                  <td>{record.email || "N/A"}</td>
-                  <td>{record.activity || "N/A"}</td>
-                  <td>{record.timestamp || "N/A"}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+            {/* Body */}
+            <tbody>
+              {errors.map((err, index) => {
+                let record = {};
+
+                try {
+                  record =
+                    typeof err.record_data === "string"
+                      ? JSON.parse(err.record_data)
+                      : err.record_data;
+                } catch (e) {
+                  console.log("Parse error:", e);
+                }
+
+                return (
+                  <tr
+                    key={index}
+                    className="border-b hover:bg-gray-100 transition"
+                  >
+                    <td className="py-2 px-4 text-red-500 font-medium">
+                      {err.error_message}
+                    </td>
+                    <td className="py-2 px-4">
+                      {record.userId || "N/A"}
+                    </td>
+                    <td className="py-2 px-4">
+                      {record.email || "N/A"}
+                    </td>
+                    <td className="py-2 px-4">
+                      {record.activity || "N/A"}
+                    </td>
+                    <td className="py-2 px-4">
+                      {record.timestamp || "N/A"}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+
+          </table>
+        </div>
       ) : (
-        <p>No invalid records ❌</p>
+        <p className="text-center text-gray-600 mt-4">
+          No invalid records ❌
+        </p>
       )}
     </div>
   );
