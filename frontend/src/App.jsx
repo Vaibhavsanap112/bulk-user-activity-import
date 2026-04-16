@@ -24,8 +24,8 @@ function App() {
 
       <Route path='/' element={<Login></Login>}></Route>
       <Route path='/signup' element={<Signup></Signup>}></Route>
-      <Route path='/upload' element={<Upload></Upload>}></Route>
-      <Route path='/errors' element={<Errors></Errors>}></Route>
+      <Route path='/upload' element={<ProtectedRoute> <Upload></Upload></ProtectedRoute>}></Route>
+      <Route path='/errors' element={<ProtectedRoute><Errors></Errors></ProtectedRoute>}></Route>
      </Routes>
      
      
