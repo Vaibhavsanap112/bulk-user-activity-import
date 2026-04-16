@@ -8,6 +8,7 @@ const loginSchema = Joi.object({
 
 const validateLogin = (data)=>
 {
+  const {error} = loginSchema.validate(data);
   if(error) {
     return error.details[0].message;
   }

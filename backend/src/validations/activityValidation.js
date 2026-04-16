@@ -13,7 +13,7 @@ const validateRecord = (record) =>{
 
 
   if(error){
-    return error. detail[0].message;
+    return error. details[0].message;
 
   }
 
