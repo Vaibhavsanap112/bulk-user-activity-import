@@ -12,8 +12,8 @@ export default function Login() {
     // 🔥 Validation
     if (!email || !password) {
       setError("All fields are required");
-      return;
-    }
+      return;0
+     }
 
     if (!email.includes("@")) {
       setError("Invalid email format");
@@ -31,12 +31,16 @@ export default function Login() {
 
       const data = await res.json();
 
-      if (res.ok) {
-        localStorage.setItem("userId", data.userId);
-        navigate("/upload");
-      } else {
-        setError(data.message || "Login failed");
-      }
+if (res.ok) {
+  if (data.token) {
+    localStorage.removeItem("token");
+    localStorage.setItem("token", data.token);
+  }
+
+  navigate("/upload");
+} else {
+  setError(data.message || "Login failed");
+}
     } catch (err) {
       setError("Network error. Try again.");
     }

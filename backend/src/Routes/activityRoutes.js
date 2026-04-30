@@ -6,6 +6,6 @@ const activityController = require("../Controllers/acitivityController");
 const { route } = require("./authRoutes");
 
 
-router.post("/bulk", activityController.bulkInsert);
+router.post("/bulk",authMiddleware, activityController.bulkInsert);
 
 module.exports = router;

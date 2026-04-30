@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const jwt = require("jsonwebtoken");
 
 
 const db = require("../Config/db");
@@ -70,7 +71,17 @@ exports.login = (req,res)=>{
       return res.status(400).json({message:"Invalid Password"});
     }
 
-    res.json({message:"Login Successful"});
+
+    const token = jwt.sign(
+      {
+        id:user.id,
+        email:user.email,
+      },
+      "secretkey",
+      {expiresIn:"1h"}
+    )
+
+    res.json({message:"Login Successful", token:token});
 
     })
 }

@@ -8,6 +8,8 @@ export default function Upload() {
 
   const handleUpload = async () => {
     try {
+
+      const token = localStorage.getItem("token");
       if (!file) {
         setError("Please select a file");
         return;
@@ -43,6 +45,7 @@ export default function Upload() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization":`Bearer ${token}`,
         },
         body: JSON.stringify({ totalRecords: jsonData.length }),
       });
@@ -64,7 +67,7 @@ export default function Upload() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "userId":localStorage.getItem("userId"),
+            "Authorization":`Bearer ${token}`,
           },
           body: JSON.stringify({
             importId,
